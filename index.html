@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>sktools – SK Constructions</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-bg">
+    <div class="auth-logo-wrap">
+      <div class="auth-logo-box">SK</div>
+      <h1 class="auth-title">sktools</h1>
+      <p class="auth-sub">SK CONSTRUCTIONS</p>
+    </div>
+    <div class="auth-card" id="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-signin" onclick="switchAuthTab('signin')">Sign In</button>
+        <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</button>
+      </div>
+      <!-- SIGN IN -->
+      <div id="form-signin">
+        <div class="form-group"><label>Username</label><input id="si-user" placeholder="Enter username" autocomplete="username"></div>
+        <div class="form-group"><label>Password</label>
+          <div class="pw-wrap"><input id="si-pass" type="password" placeholder="Password" autocomplete="current-password"><button class="pw-eye" onclick="togglePw('si-pass',this)">👁</button></div>
+        </div>
+        <div id="si-err" class="auth-err"></div>
+        <button class="btn btn-primary btn-block" onclick="doSignIn()">Sign In</button>
+      </div>
+      <!-- SIGN UP -->
+      <div id="form-signup" style="display:none">
+        <div class="form-group"><label>Full Name</label><input id="su-name" placeholder="Your name"></div>
+        <div class="form-group"><label>Username</label><input id="su-user" placeholder="Choose username" autocomplete="username"></div>
+        <div class="form-group"><label>Password</label>
+          <div class="pw-wrap"><input id="su-pass" type="password" placeholder="Min 6 characters" autocomplete="new-password"><button class="pw-eye" onclick="togglePw('su-pass',this)">👁</button></div>
+        </div>
+        <div class="form-group"><label>4-digit Security PIN</label>
+          <input id="su-pin" type="password" inputmode="numeric" maxlength="4" placeholder="PIN for edits/deletes">
+        </div>
+        <div id="su-err" class="auth-err"></div>
+        <button class="btn btn-primary btn-block" onclick="doSignUp()">Create Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none">
+  <div class="header">
+    <div class="logo-box">SK</div>
+    <div class="header-text">
+      <h1>sktools</h1>
+      <p>SK Constructions</p>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+      <span id="hdr-user" style="color:var(--gold);font-size:12px;font-weight:600"></span>
+      <button class="icon-btn" onclick="doLogout()" title="Logout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="page-dashboard" class="page active"></div>
+  <div id="page-expenses" class="page"></div>
+  <div id="page-labour" class="page"></div>
+  <div id="page-payroll" class="page"></div>
+  <div id="page-reports" class="page"></div>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="navigate('dashboard',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-btn" onclick="navigate('expenses',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+      Expenses
+    </button>
+    <button class="nav-btn" onclick="navigate('labour',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+      Labour
+    </button>
+    <button class="nav-btn" onclick="navigate('payroll',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      Payroll
+    </button>
+    <button class="nav-btn" onclick="navigate('reports',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Reports
+    </button>
+  </nav>
+</div>
+
+<!-- PIN MODAL -->
+<div class="modal-overlay" id="modal-pin">
+  <div class="modal" style="max-width:340px;margin:auto;border-radius:16px">
+    <div class="modal-title" id="pin-title">Enter Security PIN <button class="modal-close" onclick="closeModal('modal-pin');pinCallback=null">×</button></div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px">Enter your 4-digit PIN to continue</p>
+    <div class="pin-dots" id="pin-dots">
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <div class="pin-pad">
+      <button onclick="pinKey('1')">1</button><button onclick="pinKey('2')">2</button><button onclick="pinKey('3')">3</button>
+      <button onclick="pinKey('4')">4</button><button onclick="pinKey('5')">5</button><button onclick="pinKey('6')">6</button>
+      <button onclick="pinKey('7')">7</button><button onclick="pinKey('8')">8</button><button onclick="pinKey('9')">9</button>
+      <button onclick="pinKey('C')" style="background:var(--slate2);color:var(--text)">C</button>
+      <button onclick="pinKey('0')">0</button>
+      <button onclick="pinKey('X')" style="background:var(--red);color:#fff">⌫</button>
+    </div>
+    <div id="pin-err" class="auth-err" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- ADD PROJECT MODAL -->
+<div class="modal-overlay" id="modal-project">
+  <div class="modal">
+    <div class="modal-title" id="proj-modal-title">Add Project <button class="modal-close" onclick="closeModal('modal-project')">×</button></div>
+    <div class="form-group"><label>Project Name *</label><input id="inp-pname" placeholder="e.g. Ravi Residence G+1"></div>
+    <div class="form-group"><label>Client Name</label><input id="inp-pclient" placeholder="Client name"></div>
+    <div class="form-group"><label>Location</label><input id="inp-ploc" placeholder="Site location"></div>
+    <div class="form-group">
+      <label>Project Type *</label>
+      <div class="type-toggle">
+        <button type="button" class="type-btn active" id="ptype-fixed" onclick="setProjType('fixed')">📋 Fixed Contract</button>
+        <button type="button" class="type-btn" id="ptype-daily" onclick="setProjType('daily')">🔨 Daily Wages / Renovation</button>
+      </div>
+      <input type="hidden" id="inp-ptype" value="fixed">
+    </div>
+    <div id="contract-value-row" class="form-group"><label>Contract Value (₹) *</label><input id="inp-pvalue" type="number" placeholder="1500000"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Start Date</label><input id="inp-pdate" type="date" max=""></div>
+      <div class="form-group"><label>Status</label>
+        <select id="inp-pstatus"><option value="Active">Active</option><option value="Completed">Completed</option><option value="On Hold">On Hold</option></select>
+      </div>
+    </div>
+    <input type="hidden" id="inp-pedit-id">
+    <button class="btn btn-primary btn-block" id="proj-save-btn" onclick="saveProject()">Add Project</button>
+  </div>
+</div>
+
+<!-- ADD EXPENSE MODAL -->
+<div class="modal-overlay" id="modal-expense">
+  <div class="modal">
+    <div class="modal-title">Add Expense <button class="modal-close" onclick="closeModal('modal-expense')">×</button></div>
+    <div class="form-group"><label>Project</label><select id="inp-eproj"></select></div>
+    <div class="form-row">
+      <div class="form-group"><label>Date</label><input id="inp-edate" type="date"></div>
+      <div class="form-group"><label>Amount (₹) *</label><input id="inp-eamt" type="number" placeholder="0"></div>
+    </div>
+    <div class="form-group"><label>Stage / Category</label>
+      <select id="inp-estage">
+        <option>Centring</option><option>Slab Casting</option><option>Brickwork</option>
+        <option>Plastering</option><option>Electrical/Plumbing</option><option>Material/Purchase</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Notes</label><textarea id="inp-enotes" rows="2" placeholder="Description..."></textarea></div>
+    <div class="form-group"><label>Bill/Receipt Image</label><input type="file" accept="image/*" style="font-size:13px"></div>
+    <button class="btn btn-primary btn-block" onclick="addExpense()">Save Expense</button>
+  </div>
+</div>
+
+<!-- ADD WORKER MODAL -->
+<div class="modal-overlay" id="modal-worker">
+  <div class="modal">
+    <div class="modal-title">Add Worker <button class="modal-close" onclick="closeModal('modal-worker')">×</button></div>
+    <div class="form-group"><label>Worker Name *</label><input id="inp-wname" placeholder="Full name"></div>
+    <div class="form-group"><label>Trade</label>
+      <select id="inp-wtrade">
+        <option>Mason</option><option>Helper</option><option>Barbender</option><option>Carpenter</option><option>Electrician</option><option>Plumber</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Daily Wage Rate (₹) *</label><input id="inp-wwage" type="number" placeholder="600"></div>
+    <button class="btn btn-primary btn-block" onclick="addWorker()">Add Worker</button>
+  </div>
+</div>
+
+<!-- WEEKLY BILLING MODAL -->
+<div class="modal-overlay" id="modal-billing">
+  <div class="modal">
+    <div class="modal-title">Weekly Billing Report <button class="modal-close" onclick="closeModal('modal-billing')">×</button></div>
+    <div id="billing-proj-name" style="font-size:13px;color:var(--text2);margin-bottom:12px"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Week Start</label><input type="date" id="bill-start" onchange="renderBillingPreview()"></div>
+      <div class="form-group"><label>Week End</label><input type="date" id="bill-end" onchange="renderBillingPreview()"></div>
+    </div>
+    <div class="form-group">
+      <label>Contractor Margin / Supervision Charge (%)</label>
+      <input type="number" id="bill-margin" value="0" min="0" max="100" placeholder="0" oninput="renderBillingPreview()">
+    </div>
+    <div id="billing-preview"></div>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn btn-navy" style="flex:1" onclick="printBillingReport()">🖨 Print</button>
+      <button class="btn btn-primary" style="flex:1" onclick="copyBillingWhatsApp()">📲 Send via WhatsApp</button>
+      <button class="btn btn-outline" style="flex:1" onclick="downloadBillingCSV()">⬇ CSV</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
